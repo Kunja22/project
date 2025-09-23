@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        label 'ecs-agent'
+        label 'custom-agent'
     }
     
     parameters {
@@ -29,7 +29,7 @@ pipeline {
     environment {
         TF_VAR_environment = "${params.ENVIRONMENT}"
         AWS_DEFAULT_REGION = 'eu-west-2'
-        TF_STATE_BUCKET = 'terraform-state-bucket-cdec41'
+        TF_STATE_BUCKET = 's3backend-21'
         TF_STATE_KEY = 'global/${params.ENVIRONMENT}/terraform-v2.tfstate'
         TF_STATE_REGION = 'eu-west-2'
     }
@@ -67,12 +67,11 @@ pipeline {
                             cat > backend.tf << EOF
 terraform {
   backend "s3" {
-    bucket         = "terraform-state-bucket-cdec41"
+    bucket         = "s3backend-21"
     key            = "global/dev/terraform-global.tfstate"
-    region         = "eu-west-1"
+    region         = "eu-west-2"
     encrypt        = true
-    dynamodb_table = "terraform-state-lock"
-    use_lockfile   = true
+    
   }
 }
 EOF
