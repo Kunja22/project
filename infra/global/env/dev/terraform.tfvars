@@ -3,7 +3,7 @@
 aws_region = "eu-west-2"
 
 # Domain Configuration
-domain_name = "Awslife.life"  # Replace with your actual domain
+domain_name = "awslife.life"  # Replace with your actual domain
 create_hosted_zone = true
 
 # CloudFront Configuration
