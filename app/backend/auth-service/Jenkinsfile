@@ -75,6 +75,7 @@ pipeline {
                 echo 'Building Spring Boot application...'
                 sh '''
                     cd app/backend/auth-service
+                    chmod +x mvnw
                     ./mvnw clean package -DskipTests
                 '''
             }
