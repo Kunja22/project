@@ -6,7 +6,7 @@ pipeline {
     environment {
         AWS_REGION = 'eu-west-2'
         EKS_CLUSTER_NAME = 'backend-dev-cluster'
-        DOCKER_REGISTRY = 'public.ecr.aws/l2n7o0v2/cloudblitz/auth-service'
+        DOCKER_REGISTRY = '544109289060.dkr.ecr.eu-west-2.amazonaws.com/cloudblitz/auth-service'
         IMAGE_NAME = 'cloudblitz/auth-service'
         KUBE_NAMESPACE = 'cloudblitz'
     }
