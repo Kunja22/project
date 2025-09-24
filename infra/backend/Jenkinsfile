@@ -65,9 +65,9 @@ pipeline {
                             cat > backend.tf << 'EOF'
 terraform {
   backend "s3" {
-    bucket         = "terraform-state-bucket-cdec41"
+    bucket         = "s3backend-21"
     key            = "backend/dev/terraform-v2.tfstate"
-    region         = "eu-west-1"
+    region         = "eu-west-2"
     encrypt        = true
     
   }
