@@ -30,8 +30,8 @@ pipeline {
     // Environment variables available throughout the pipeline
     environment {
         TF_VAR_environment = "${params.ENVIRONMENT}"
-        AWS_DEFAULT_REGION = 'eu-west-1'
-        TF_STATE_BUCKET = 'terraform-state-bucket-cdec41'
+        AWS_DEFAULT_REGION = 'eu-west-2'
+        TF_STATE_BUCKET = 's3backend-21'
         TF_STATE_KEY = 'backend/${params.ENVIRONMENT}/terraform-v2.tfstate'
         TF_STATE_REGION = 'eu-west-2'
     }
