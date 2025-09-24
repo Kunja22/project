@@ -3,7 +3,7 @@
 aws_region = "eu-west-2"
 
 # S3 Configuration
-s3_bucket_name     = "awslife.life-1"
+s3_bucket_name     = "awslife.life-2"
 s3_enable_versioning = true
 
 # CloudFront Configuration
