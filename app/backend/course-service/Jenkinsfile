@@ -75,6 +75,7 @@ pipeline {
                 echo 'Building and testing Spring Boot application...'
                 sh '''
                     cd app/backend/course-service
+                    chmod +x mvnw
                     ./mvnw clean verify
                 '''
             }
