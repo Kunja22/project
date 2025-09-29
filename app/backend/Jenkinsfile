@@ -103,16 +103,21 @@ pipeline {
             }
         }
         
-        stage('Build Docker Images') {
+        stage('ECR Login (Build)') {
             agent {
                 label 'master'
             }
             steps {
-                echo 'Logging into ECR and building Docker images...'
+                echo 'Logging into ECR for building Docker images...'
                 sh """
-                    # Login to ECR
                     aws ecr get-login-password --region eu-west-2 |  docker login --username AWS --password-stdin ${DOCKER_REGISTRY}
                 """
+            }
+        }
+        
+        stage('Build Docker Images') {
+            agent {
+                label 'master'
             }
             parallel {
                 stage('Build Auth Service Image') {
@@ -166,16 +171,21 @@ pipeline {
             }
         }
         
-        stage('Push Docker Images') {
+        stage('ECR Login (Push)') {
             agent {
                 label 'master'
             }
             steps {
-                echo 'Pushing Docker images to ECR registry...'
+                echo 'Logging into ECR for pushing Docker images...'
                 sh """
-                    # Login to ECR
                     aws ecr get-login-password --region eu-west-2 |  docker login --username AWS --password-stdin ${DOCKER_REGISTRY}
                 """
+            }
+        }
+
+        stage('Push Docker Images') {
+            agent {
+                label 'master'
             }
             parallel {
                 stage('Push Auth Service Image') {
