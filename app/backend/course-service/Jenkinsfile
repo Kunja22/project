@@ -94,7 +94,7 @@ pipeline {
                     
                     sh """
                         # Login to ECR
-                        aws ecr get-login-password --region eu-west-2 |  docker login --username AWS --password-stdin ${DOCKER_REGISTRY}
+                        aws ecr get-login-password --region sa-east-1 |  docker login --username AWS --password-stdin ${DOCKER_REGISTRY}
                         
                         cd app/backend/course-service
                         docker build -t ${fullImageName} .
