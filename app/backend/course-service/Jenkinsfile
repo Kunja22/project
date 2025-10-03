@@ -1,12 +1,12 @@
 pipeline {
     agent {
-        label 'custom-agent'
+        label 'custom-agents'
     }
     
     environment {
-        AWS_REGION = 'eu-west-2'
-        EKS_CLUSTER_NAME = 'backend-dev-cluster'
-        DOCKER_REGISTRY = '544109289060.dkr.ecr.eu-west-2.amazonaws.com'
+        AWS_REGION = 'sa-east-1'
+        EKS_CLUSTER_NAME = 'backend-dev-clusters'
+        DOCKER_REGISTRY = '544109289060.dkr.ecr.sa-east-1.amazonaws.com/cloudblitz/course-service'
         IMAGE_NAME = 'cloudblitz/course-service'
         KUBE_NAMESPACE = 'cloudblitz'
     }
@@ -114,7 +114,7 @@ pipeline {
                 echo 'Pushing Docker image to ECR registry...'
                 sh """
                     # Login to ECR
-                    aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin ${DOCKER_REGISTRY}
+                    aws ecr get-login-password --region sa-east-1 | docker login --username AWS --password-stdin ${DOCKER_REGISTRY}
                     
                     # Push images to ECR
                     docker push ${DOCKER_IMAGE}
