@@ -4,11 +4,11 @@ pipeline {
     }
 
     environment {
-        AWS_REGION = 'sa-east-1'
+        AWS_REGION       = 'sa-east-1'
         EKS_CLUSTER_NAME = 'backend-dev-clusters'
-        DOCKER_REGISTRY = '544109289060.dkr.ecr.sa-east-1.amazonaws.com'
-        IMAGE_NAME = 'cloudblitz/course-services'
-        KUBE_NAMESPACE = 'cloudblitz'
+        DOCKER_REGISTRY  = '544109289060.dkr.ecr.sa-east-1.amazonaws.com'
+        IMAGE_NAME       = 'cloudblitz/course-services'
+        KUBE_NAMESPACE   = 'cloudblitz'
     }
 
     stages {
@@ -31,7 +31,7 @@ pipeline {
                             echo "Java 17+ already available"
                             export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
                         else
-                            echo "Downloading and installing OpenJDK 17 manually..."
+                            echo "Installing OpenJDK 17..."
                             wget -O openjdk-17.tar.gz https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-x64_bin.tar.gz
                             mkdir -p ~/java
                             tar -xzf openjdk-17.tar.gz -C ~/java
@@ -40,7 +40,7 @@ pipeline {
                             rm openjdk-17.tar.gz
                         fi
                     else
-                        echo "Downloading and installing OpenJDK 17 manually..."
+                        echo "Installing OpenJDK 17..."
                         wget -O openjdk-17.tar.gz https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-x64_bin.tar.gz
                         mkdir -p ~/java
                         tar -xzf openjdk-17.tar.gz -C ~/java
@@ -59,7 +59,7 @@ pipeline {
             steps {
                 echo 'Building Spring Boot application...'
                 sh '''
-                    cd app/backend/enrollment-service
+                    cd app/backend/course-service
                     chmod +x mvnw
                     ./mvnw clean package
                 '''
@@ -71,19 +71,14 @@ pipeline {
                 label 'master'
             }
             steps {
-                echo 'Building Docker image on master host...'
+                echo 'Building Docker image...'
                 script {
                     def imageTag = "${env.BUILD_NUMBER}"
                     def fullImageName = "${DOCKER_REGISTRY}/${IMAGE_NAME}:${imageTag}"
 
                     sh """
                         aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${DOCKER_REGISTRY}
-
-                        # Ensure ECR repo exists
-                        aws ecr describe-repositories --repository-names ${IMAGE_NAME} --region ${AWS_REGION} || \
-                        aws ecr create-repository --repository-name ${IMAGE_NAME} --region ${AWS_REGION}
-
-                        cd app/backend/enrollment-service
+                        cd app/backend/course-service
                         docker build -t ${fullImageName} .
                         docker tag ${fullImageName} ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest
                     """
@@ -98,7 +93,7 @@ pipeline {
                 label 'master'
             }
             steps {
-                echo 'Pushing Docker image to ECR registry...'
+                echo 'Pushing Docker image to ECR...'
                 sh """
                     aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${DOCKER_REGISTRY}
                     docker push ${DOCKER_IMAGE}
@@ -116,9 +111,9 @@ pipeline {
                         sh """
                             aws eks update-kubeconfig --region ${AWS_REGION} --name ${EKS_CLUSTER_NAME}
                             kubectl create namespace ${KUBE_NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
-                            sed -i 's|image: cloudblitz/enrollment-service:latest|image: ${DOCKER_IMAGE}|g' app/backend/enrollment-service/k8s/deployment.yaml
-                            kubectl apply -f app/backend/enrollment-service/k8s/
-                            kubectl rollout status deployment/enrollment-service -n ${KUBE_NAMESPACE} --timeout=600s
+                            sed -i 's|image: cloudblitz/course-services:latest|image: ${DOCKER_IMAGE}|g' app/backend/course-service/k8s/deployment.yaml
+                            kubectl apply -f app/backend/course-service/k8s/
+                            kubectl rollout status deployment/course-service -n ${KUBE_NAMESPACE} --timeout=300s
                         """
                     }
                 }
@@ -131,9 +126,9 @@ pipeline {
                 script {
                     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
                         sh """
-                            kubectl get service enrollment-service -n ${KUBE_NAMESPACE}
-                            kubectl wait --for=condition=ready pod -l app=enrollment-service -n ${KUBE_NAMESPACE} --timeout=600s
-                            echo "Enrollment service deployment completed successfully!"
+                            kubectl get service course-service -n ${KUBE_NAMESPACE}
+                            kubectl wait --for=condition=ready pod -l app=course-service -n ${KUBE_NAMESPACE} --timeout=300s
+                            echo "Course service deployment completed successfully!"
                         """
                     }
                 }
@@ -147,10 +142,10 @@ pipeline {
             deleteDir()
         }
         success {
-            echo 'Enrollment service deployment successful!'
+            echo 'Deployment successful!'
         }
         failure {
-            echo 'Enrollment service deployment failed!'
+            echo 'Deployment failed!'
         }
     }
 }
