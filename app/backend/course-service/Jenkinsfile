@@ -7,7 +7,7 @@ pipeline {
         AWS_REGION = 'sa-east-1'
         EKS_CLUSTER_NAME = 'backend-dev-clusters'
         DOCKER_REGISTRY = '544109289060.dkr.ecr.sa-east-1.amazonaws.com'
-        IMAGE_NAME =  'course-services'
+        IMAGE_NAME =  'cloudblitz/course-services'
         KUBE_NAMESPACE = 'cloudblitz'
     }
     
